@@ -1,7 +1,7 @@
 import logging
 import math
 import os
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 import numpy as np
 
@@ -22,26 +22,23 @@ class ILPSolver:
     def __init__(
         self,
         g: DFGraph,
-        budget: int,
+        budget_per_node: List[int],
         eps_noise=None,
-        seed_s=None,
         integral=True,
         imposed_schedule: ImposedSchedule = ImposedSchedule.FULL_SCHEDULE,
         solve_r=True,
         write_model_file: Optional[PathLike] = None,
-        gurobi_params: Dict[str, Any] = None,
+        gurobi_params: Dict[str, Any] = None
     ):
-        self.GRB_CONSTRAINED_PRESOLVE_TIME_LIMIT = 300  # todo (paras): read this from gurobi_params
+        self.g = g
+        self.budget_per_node = budget_per_node
         self.gurobi_params = gurobi_params
         self.num_threads = self.gurobi_params.get("Threads", 1)
         self.model_file = write_model_file
-        self.seed_s = seed_s
         self.integral = integral
         self.imposed_schedule = imposed_schedule
         self.solve_r = solve_r
         self.eps_noise = eps_noise
-        self.budget = budget
-        self.g = g
         self.solve_time = None
 
         if not self.integral:
